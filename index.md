@@ -70,3 +70,90 @@ This section describes a typical process in which Secure Device Onboard is used 
 
 The following diagram shows an example of a possible IoT supply chain and the steps taken by each participant in the Secure Device Onboard service. Each step is described in more detail in follwing sections. 
 
+INSERT PICTURE HERE
+
+### Step 1: Manufacturing
+
+The manufacturer sets up a manufacturing station that uses the Secure Device Onboard *Manufacturer Toolkit* to initialize the device. Device initialization puts the Secure Device Onboard *client software* and security credentials on the device. 
+
+Device initialization also creates an ownership voucher. The ownership voucher is a digital document that securely records changes in ownership. The ownership voucher travels with the device but is never physically on a device, which is similar to, for example, a shipping invoice. Each device has a unique ownership voucher. The ownership voucher contains the following information: 
+
+**Device GUID**: A unique string that identifies the device 
+
+**Credential ID**: A reference to the ownership voucher 
+
+**Rendezvous Server Location**: One or more URIs identifying where a Secure Device Onboard *Rendezvous Service* can be contacted by the device
+
+**Manufacturers public key**: A key uniquely identifying the manufacturer of the device
+
+Behind the scenes, the *Manufacturer Toolkit* uses the Device Initialize (DI) protocol to perform device initialization. 
+
+After device initialization is complete, the manufacturer associates the ownership voucher with the device, for example, by associating the GUID with the device serial number. For tracking, the manufacturer can also print the GUID on a label on the device box.   
+
+When the manufacturer sells the device to a distributor, the manufacturer acquires the distributor’s public key as a part of the ordering process. The manufacturer then uses the *Manufacturer Toolkit* to counter-sign the ownership voucher. This requires adding the distributor’s public key to the ownership voucher. The manufacturer then ships the device to the distributor and sends the ownership voucher to the distributor via either a file or through B2B integration. 
+
+### Step 2: Distribution
+
+The distributor receives the device and ownership voucher from the manufacturer. Like the manufacturer, the distributor associates the ownership voucher with the device, for example, by associating the GUID with the device serial number.  
+
+When the distributor sells the device to the system integrator or another retailer, the distributor acquires the buyer’s public key as a part of the ordering process. The distributor then uses Intel SDO reseller toolkit to counter-sign the ownership voucher. The distributor then ships the device to the buyer and sends the ownership voucher via either a file or through B2B integration. 
+
+The preceding process continues until the device is sold to a system integrator. 
+
+### Step 3: System Integration
+
+The system integrator receives the device and ownership voucher from the distributor. Like the distributor, the system integrator associates the ownership voucher with the device, for example, by associating the GUID with the device serial number. 
+
+The system integrator acquires the IoT Platform provider’s public key and uses the Secure Device Onboard *Reseller Toolkit* to counter-sign the ownership voucher for the last time. The system integrator then sends the ownership voucher to the IoT Platform service provider via either a file or through B2B integration. 
+
+### Step 4: Ownership
+
+The IoT Platform provider registers the ownership voucher with the *Rendezvous Service*. The *Rendezvous Service* may be operated by a cloud service provider, the IOT Platform service provider, or other service provider entity. Behind the scenes, the IOT Platform uses the Transfer Ownership 0 (TO0) protocol to communicate with the Rendezvous server. 
+
+To facilitate easy integration with Secure Device Onboard, the IOT Platform can use the Secure Device Onboard *IOT Platform SDK*, which implements the protocol features required by the IPT Platform to communicate with the Rendezvous service, and provides an easy REST-based interface to communicate between the SDK components and the IOT Platform.
+
+### Step 5: Device Discovers IOT Platform
+
+At this point, the system integrator installs the device, applies power, and connects it to the Internet. The device uses the location of the rendezvous server provided in step 1 to contact the Rendezvous Service, whereupon it receives a URI indicating where to connect to the IoT platform provider. 
+
+Behind the scenes, the Secure Device Onboard Client SDK software uses the Transfer Ownership 1 (TO1) protocol to communicate with the Rendezvous Service.   
+
+Note that ideally, the system integrator waits to install the device until it has received confirmation from the IoT Platform that Step 4 is complete. 
+However, if the device contacts the rendezvous server before Step 4 is complete, the device will continue to retry the connection to the server until it gets the IoT Platform location.  
+
+### Step 6: Device Onboards
+
+After receiving the IoT Platform URI, the device contacts the IoT platform. The IoT platform provides new security credentials. The credentials programmed during device initialization are now replaced with the new credentials. Behind the scenes, the device uses the Transfer Ownership 2 (TO2) protocol to communicate with the IOT Platform SDK. 
+
+At this point, the onboarding is complete. The system integrator and IoT Platform can now complete additional provisioning steps on their own because a trusted connection has been established between the device and the IoT Platform. 
+
+## Next Steps
+
+### Developers
+
+Developers can get stated by visiting the Secure Device Onboard *Community* page.
+
+The *Secure Device Onboard Protocol Specification* provide developers with the details of protocol operation.
+
+The *Customer Reference Implementation* provides a self-contained implementation of the Secure Device Onboard protocol, which can be used as a reference implementation, as a place to get started prototyping new protocol feature, or as a validation tool 
+
+### All-In-One Demo
+
+The *All-In-One Demo* runs the Rendezvous Service, a simulated IOT Platform using the *IOT Platform SDK*, and the *Manufacturing Toolkit*. Using it, you can run a device enable with the *Client SDK* software through the entire Secure Device Onboard lifecycle.  
+
+### Manufacturers
+
+Manufactures interested in implementing support for Secure Device Onboard in their factories can learn more by referring to the Secure Device Onboard *Manufacturer Enablement Guide*.
+
+### Distributers and Resellers
+
+Distributers and resellers interested in implementing support for Secure Device Onboard in their business processes can learn more by referring to the Secure Device Onboard *Reseller Enablement Guide*
+
+### IOT Platform Providers
+
+IOT Platform Providers interested in implementing support for Secure Device Onboard in their IOT Platforms can learn more by referring to the Secure Device Onboard *IoT Platform Integration SDK Reference Guide*
+
+### Cloud Service Operators
+Cloud Service Operators interesting in supporting Secure Device Onboarding in their IOT services can learn more by referring to the *Secure Device Onboard Protocol*, the *Rendezvous Service* implementation, and the *Customer Reference Implementation*.
+
+
